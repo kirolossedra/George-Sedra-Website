@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="A dynamic animated single-file website demo." />
+  <title>Dynamic Animated Website</title>
+
+  <style>
+    /* -----------------------------
+      RESET + TOKENS
+    ----------------------------- */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height: 1.45;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { font: inherit; }
+
+    :root {
+      --bg: #070A12;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.09);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+      --border: rgba(255,255,255,.14);
+      --shadow: 0 20px 60px rgba(0,0,0,.4);
+      --accent: #7C5CFF;
+      --accent2: #28D8FF;
+      --good: #55F2A6;
+      --warn: #FFC857;
+
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+
+      --container: 1120px;
+      --pad: 24px;
+
+      --blur: 16px;
+      --ease: cubic-bezier(.2,.9,.2,1);
+      --ease2: cubic-bezier(.2,.7,.2,1);
+    }
+
+    [data-theme="light"] {
+      --bg: #F7F8FC;
+      --panel: rgba(0,0,0,.04);
+      --panel2: rgba(0,0,0,.07);
+      --text: rgba(0,0,0,.9);
+      --muted: rgba(0,0,0,.65);
+      --muted2: rgba(0,0,0,.52);
+      --border: rgba(0,0,0,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.14);
+    }
+
+    /* -----------------------------
+      BACKGROUND FX
+    ----------------------------- */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(900px 600px at 20% 15%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(40,216,255,.16), transparent 60%),
+        radial-gradient(1000px 700px at 60% 85%, rgba(85,242,166,.14), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.15));
+      transition: filter .6s var(--ease);
+    }
+    [data-theme="light"] .bg {
+      filter: saturate(1.15);
+      background:
+        radial-gradient(900px 600px at 20% 15%, rgba(124,92,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(40,216,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 85%, rgba(85,242,166,.12), transparent 55%),
+        linear-gradient(180deg, rgba(255,255,255,.0), rgba(0,0,0,.04));
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: .10;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+      background-size: 220px 220px;
+      transform: translateZ(0);
+    }
+
+    /* -----------------------------
+      LAYOUT
+    ----------------------------- */
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 var(--pad);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(var(--blur));
+      background: color-mix(in oklab, var(--bg) 65%, transparent);
+      border-bottom: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+    }
+    .nav {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 40%),
+        linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 25px rgba(124,92,255,.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .logo::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: conic-gradient(from 90deg, rgba(255,255,255,.18), transparent, rgba(255,255,255,.18));
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .navlinks a {
+      padding: 10px 10px;
+      border-radius: 999px;
+      transition: background .25s var(--ease), color .25s var(--ease);
+    }
+    .navlinks a:hover {
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform .2s var(--ease), background .25s var(--ease), border-color .25s var(--ease);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+    .btn:hover { transform: translateY(-1px); background: var(--panel2); }
+    .btn:active { transform: translateY(0px) scale(.99); }
+
+    .btn.primary {
+      border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+      background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 70%, #000 0%), color-mix(in oklab, var(--accent2) 70%, #000 0%));
+      box-shadow: 0 16px 50px rgba(124,92,255,.22);
+    }
+
+    .hamburger { display: none; }
+    @media (max-width: 860px) {
+      .navlinks { display: none; }
+      .hamburger { display: inline-flex; }
+    }
+
+    /* -----------------------------
+      HERO
+    ----------------------------- */
+    .hero {
+      padding: 64px 0 30px;
+      position: relative;
+    }
+    .heroGrid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 28px;
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .heroGrid { grid-template-columns: 1fr; }
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+      width: fit-content;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--good);
+      box-shadow: 0 0 0 6px rgba(85,242,166,.18);
+      animation: pulse 1.8s var(--ease) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: .85; }
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(34px, 4.2vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -.04em;
+    }
+    .lead {
+      margin: 12px 0 18px;
+      color: var(--muted);
+      max-width: 52ch;
+      font-size: 16px;
+    }
+
+    .heroActions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .miniRow {
+      display: flex;
+      gap: 16px;
+      margin-top: 18px;
+      color: var(--muted2);
+      font-weight: 700;
+      font-size: 13px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .miniRow span {
+      display: inline-flex; gap: 8px; align-items: center;
+    }
+    .check {
+      width: 18px; height: 18px; border-radius: 6px;
+      background: color-mix(in oklab, var(--good) 25%, transparent);
+      border: 1px solid color-mix(in oklab, var(--good) 55%, var(--border));
+      display: inline-grid; place-items: center;
+      color: var(--good);
+      font-size: 12px;
+    }
+
+    .heroCard {
+      position: relative;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 85%, transparent), color-mix(in oklab, var(--panel2) 85%, transparent));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 420px;
+      transform-style: preserve-3d;
+    }
+    .heroCard .inner {
+      padding: 22px;
+      position: relative;
+      z-index: 2;
+    }
+    .heroCard h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing: -.02em;
+    }
+    .heroCard p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .stat {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      letter-spacing: -.02em;
+    }
+    .stat small {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* animated blobs */
+    .blob {
+      position: absolute;
+      inset: auto;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      filter: blur(28px);
+      opacity: .55;
+      z-index: 1;
+      transform: translateZ(0);
+      animation: floaty 10s var(--ease) infinite;
+    }
+    .blob.b1 { left: -120px; top: -140px; background: rgba(124,92,255,.45); animation-duration: 11s; }
+    .blob.b2 { right: -140px; top: 40px; background: rgba(40,216,255,.35); animation-duration: 13s; animation-delay: -3s; }
+    .blob.b3 { right: 0px; bottom: -170px; background: rgba(85,242,166,.28); animation-duration: 12s; animation-delay: -6s; }
+
+    @keyframes floaty {
+      0%, 100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(16px,-14px,0) scale(1.03); }
+    }
+
+    /* -----------------------------
+      SECTIONS
+    ----------------------------- */
+    section { padding: 54px 0; }
+    .sectionTop {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .sectionTop h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -.02em;
+    }
+    .sectionTop p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 960px) { .cards { grid-template-columns: 1fr; } }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    .card .pad { padding: 18px; }
+    .card h3 { margin: 0 0 8px; letter-spacing: -.02em; }
+    .card p { margin: 0; color: var(--muted); font-weight: 600; font-size: 14px; }
+    .pill {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel) 80%, transparent);
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      gap: 8px;
+      align-items: center;
+    }
+    .pill i {
+      width: 10px; height: 10px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: inline-block;
+    }
+
+    .divider {
+      height: 1px;
+      background: color-mix(in oklab, var(--border) 75%, transparent);
+      margin: 14px 0;
+    }
+
+    .counterRow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .counterRow { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .counterRow { grid-template-columns: 1fr; } }
+
+    .counter {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      padding: 16px;
+    }
+    .counter strong {
+      font-size: 26px;
+      letter-spacing: -.03em;
+      display: block;
+    }
+    .counter small { color: var(--muted); font-weight: 700; }
+
+    /* Gallery */
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform .2s var(--ease), background .25s var(--ease), color .25s var(--ease);
+      user-select: none;
+    }
+    .chip:hover { transform: translateY(-1px); background: var(--panel2); color: var(--text); }
+    .chip[aria-pressed="true"] {
+      background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 60%, transparent), color-mix(in oklab, var(--accent2) 45%, transparent));
+      color: var(--text);
+      border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 920px) { .gallery { grid-template-columns: 1fr; } }
+
+    .shot {
+      position: relative;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--panel);
+      cursor: pointer;
+      min-height: 170px;
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+    }
+    .shot:hover { transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,0,0,.22); }
+    .shot .thumb {
+      height: 190px;
+      background:
+        radial-gradient(300px 120px at 20% 20%, rgba(255,255,255,.14), transparent 55%),
+        linear-gradient(135deg, rgba(124,92,255,.32), rgba(40,216,255,.24));
+      filter: saturate(1.12);
+    }
+    .shot:nth-child(3n+2) .thumb {
+      background:
+        radial-gradient(300px 120px at 30% 25%, rgba(255,255,255,.12), transparent 55%),
+        linear-gradient(135deg, rgba(85,242,166,.26), rgba(124,92,255,.28));
+    }
+    .shot:nth-child(3n+3) .thumb {
+      background:
+        radial-gradient(300px 120px at 25% 20%, rgba(255,255,255,.12), transparent 55%),
+        linear-gradient(135deg, rgba(255,200,87,.22), rgba(40,216,255,.22));
+    }
+    .shot .meta {
+      padding: 14px 14px 16px;
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .shot .meta h4 { margin: 0; font-size: 15px; letter-spacing: -.02em; }
+    .shot .meta p { margin: 5px 0 0; color: var(--muted); font-weight: 600; font-size: 13px; }
+    .tag {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: color-mix(in oklab, var(--panel) 70%, transparent);
+      white-space: nowrap;
+    }
+
+    /* Testimonials */
+    .carousel {
+      position: relative;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .track {
+      display: flex;
+      transition: transform .55s var(--ease);
+      will-change: transform;
+    }
+    .slide {
+      min-width: 100%;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .quote {
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel2) 65%, transparent);
+      padding: 16px;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .who {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .who .left { display: flex; gap: 12px; align-items: center; }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar::after {
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 35% 35%, rgba(255,255,255,.55), transparent 45%);
+      transform: rotate(18deg);
+    }
+    .who strong { display:block; letter-spacing:-.02em; }
+    .who small { color: var(--muted); font-weight: 700; }
+
+    .carBtns {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+      z-index: 3;
+    }
+
+    /* Footer */
+    footer {
+      padding: 46px 0 56px;
+      border-top: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+      color: var(--muted);
+    }
+    footer .foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-weight: 650;
+    }
+
+    /* -----------------------------
+      MODAL
+    ----------------------------- */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      place-items: center;
+      padding: 16px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+    }
+    .modal[aria-hidden="false"] { display: grid; }
+    .modalCard {
+      width: min(860px, 100%);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transform-origin: center;
+      animation: pop .25s var(--ease) both;
+    }
+    @keyframes pop {
+      from { transform: translateY(8px) scale(.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modalTop {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel) 85%, transparent);
+    }
+    .modalBody {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+    }
+    @media (max-width: 860px) { .modalBody { grid-template-columns: 1fr; } }
+
+    .preview {
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      min-height: 260px;
+      background:
+        radial-gradient(700px 280px at 25% 20%, rgba(255,255,255,.14), transparent 55%),
+        linear-gradient(135deg, rgba(124,92,255,.35), rgba(40,216,255,.25));
+    }
+
+    /* -----------------------------
+      SCROLL REVEAL
+    ----------------------------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .7s var(--ease), transform .7s var(--ease);
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* -----------------------------
+      TOAST
+    ----------------------------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 70;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklab, var(--panel2) 70%, var(--bg));
+      padding: 10px 12px;
+      color: var(--text);
+      box-shadow: var(--shadow);
+      display: none;
+      gap: 10px;
+      align-items: center;
+      font-weight: 750;
+      backdrop-filter: blur(var(--blur));
+    }
+    .toast.show { display: inline-flex; animation: pop .25s var(--ease) both; }
+
+    /* -----------------------------
+      REDUCED MOTION
+    ----------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+  <div class="grain"></div>
+
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="Home">
+        <span class="logo" aria-hidden="true"></span>
+        <span>NovaPulse</span>
+      </a>
+
+      <nav class="navlinks" aria-label="Primary navigation">
+        <a href="#features">Features</a>
+        <a href="#stats">Stats</a>
+        <a href="#work">Work</a>
+        <a href="#testimonials">Testimonials</a>
+      </nav>
+
+      <div class="actions">
+        <button class="btn" id="themeBtn" aria-label="Toggle theme">
+          <span aria-hidden="true">🌓</span>
+          <span class="hideSm">Theme</span>
+        </button>
+        <button class="btn hamburger" id="menuBtn" aria-label="Open menu">
+          <span aria-hidden="true">☰</span>
+          <span class="hideSm">Menu</span>
+        </button>
+        <a class="btn primary" href="#work" id="ctaTop">
+          <span aria-hidden="true">✨</span>
+          <span>Explore</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container heroGrid">
+        <div class="reveal">
+          <div class="kicker">
+            <span class="dot" aria-hidden="true"></span>
+            Live demo • single-file • no build tools
+          </div>
+
+          <h1>
+            A dynamic website with
+            <span style="background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;">
+              animations
+            </span>
+            & interactions.
+          </h1>
+
+          <p class="lead">
+            Smooth scroll reveals, parallax cards, animated counters, filterable gallery, modal previews, and a theme toggle —
+            all in one clean <strong>index.html</strong>.
+          </p>
+
+          <div class="heroActions">
+            <button class="btn primary" id="launchBtn">
+              <span aria-hidden="true">🚀</span>
+              Launch Interaction
+            </button>
+            <a class="btn" href="#features">
+              <span aria-hidden="true">🧩</span>
+              See Features
+            </a>
+          </div>
+
+          <div class="miniRow">
+            <span><span class="check" aria-hidden="true">✓</span>Scroll reveal</span>
+            <span><span class="check" aria-hidden="true">✓</span>Modal + filters</span>
+            <span><span class="check" aria-hidden="true">✓</span>Light/Dark</span>
+          </div>
+        </div>
+
+        <div class="heroCard reveal" id="tiltHero" aria-label="Interactive preview card">
+          <div class="blob b1"></div>
+          <div class="blob b2"></div>
+          <div class="blob b3"></div>
+
+          <div class="inner">
+            <h3>Interactive Preview</h3>
+            <p>Move your mouse over this card. It tilts subtly with a sheen.</p>
+
+            <div class="grid2">
+              <div class="stat">
+                <small>Animation FPS</small>
+                <strong><span id="fps">60</span></strong>
+              </div>
+              <div class="stat">
+                <small>Active Users</small>
+                <strong><span id="liveUsers">1,248</span></strong>
+              </div>
+              <div class="stat">
+                <small>Latency</small>
+                <strong><span id="latency">24ms</span></strong>
+              </div>
+              <div class="stat">
+                <small>Status</small>
+                <strong style="color: var(--good);">Smooth</strong>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="btn" id="randomizeBtn">
+              <span aria-hidden="true">🎲</span>
+              Randomize Metrics
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+      <div class="container">
+        <div class="sectionTop reveal">
+          <div>
+            <h2>Features</h2>
+            <p>Small components that feel “alive” — with tasteful motion and fast interactions.</p>
+          </div>
+        </div>
+
+        <div class="cards">
+          <article class="card reveal tilt" data-tilt>
+            <div class="pad">
+              <div class="pill"><i aria-hidden="true"></i>Scroll Reveal</div>
+              <h3>IntersectionObserver animations</h3>
+              <p>Elements fade + slide in when they enter the viewport. Clean and performant.</p>
+            </div>
+          </article>
+
+          <article class="card reveal tilt" data-tilt>
+            <div class="pad">
+              <div class="pill"><i aria-hidden="true"></i>Micro-interactions</div>
+              <h3>Buttons, cards, toasts</h3>
+              <p>Hover, press, and modal animations add polish without feeling “too much”.</p>
+            </div>
+          </article>
+
+          <article class="card reveal tilt" data-tilt>
+            <div class="pad">
+              <div class="pill"><i aria-hidden="true"></i>Theme Toggle</div>
+              <h3>Light/Dark with persistence</h3>
+              <p>Theme is saved to localStorage and restored automatically on load.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="stats">
+      <div class="container">
+        <div class="sectionTop reveal">
+          <div>
+            <h2>Animated stats</h2>
+            <p>Counters animate when visible (great for landing pages and dashboards).</p>
+          </div>
+        </div>
+
+        <div class="counterRow">
+          <div class="counter reveal">
+            <strong><span class="count" data-to="98" data-suffix="%">0</span></strong>
+            <small>Performance score</small>
+          </div>
+          <div class="counter reveal">
+            <strong><span class="count" data-to="120" data-suffix="ms">0</span></strong>
+            <small>Average render time</small>
+          </div>
+          <div class="counter reveal">
+            <strong><span class="count" data-to="2400" data-suffix="+">0</span></strong>
+            <small>Active sessions</small>
+          </div>
+          <div class="counter reveal">
+            <strong><span class="count" data-to="42" data-suffix="">0</span></strong>
+            <small>Deploys this month</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK / GALLERY -->
+    <section id="work">
+      <div class="container">
+        <div class="sectionTop reveal">
+          <div>
+            <h2>Work gallery</h2>
+            <p>Filter cards by category, then click any item to open a modal preview.</p>
+          </div>
+        </div>
+
+        <div class="filters reveal" role="toolbar" aria-label="Gallery filters">
+          <button class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" data-filter="ui" aria-pressed="false">UI</button>
+          <button class="chip" data-filter="motion" aria-pressed="false">Motion</button>
+          <button class="chip" data-filter="data" aria-pressed="false">Data</button>
+        </div>
+
+        <div class="gallery" id="gallery">
+          <article class="shot reveal" data-cat="ui" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Gradient Dashboard</h4>
+                <p>Cards, charts, quick actions</p>
+              </div>
+              <span class="tag">UI</span>
+            </div>
+          </article>
+
+          <article class="shot reveal" data-cat="motion" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Floating Blobs</h4>
+                <p>Soft atmospheric motion</p>
+              </div>
+              <span class="tag">Motion</span>
+            </div>
+          </article>
+
+          <article class="shot reveal" data-cat="data" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Realtime Metrics</h4>
+                <p>Mini KPIs + pulses</p>
+              </div>
+              <span class="tag">Data</span>
+            </div>
+          </article>
+
+          <article class="shot reveal" data-cat="ui" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Marketing Layout</h4>
+                <p>Hero, sections, CTA flow</p>
+              </div>
+              <span class="tag">UI</span>
+            </div>
+          </article>
+
+          <article class="shot reveal" data-cat="motion" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Card Tilt + Sheen</h4>
+                <p>Mouse-based parallax</p>
+              </div>
+              <span class="tag">Motion</span>
+            </div>
+          </article>
+
+          <article class="shot reveal" data-cat="data" tabindex="0">
+            <div class="thumb" aria-hidden="true"></div>
+            <div class="meta">
+              <div>
+                <h4>Animated Counters</h4>
+                <p>Counts up on view</p>
+              </div>
+              <span class="tag">Data</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section id="testimonials">
+      <div class="container">
+        <div class="sectionTop reveal">
+          <div>
+            <h2>Testimonials</h2>
+            <p>A simple slider with smooth transitions (keyboard-friendly).</p>
+          </div>
+        </div>
+
+        <div class="carousel reveal" aria-label="Testimonials carousel">
+          <div class="carBtns">
+            <button class="btn" id="prevSlide" aria-label="Previous testimonial">←</button>
+            <button class="btn" id="nextSlide" aria-label="Next testimonial">→</button>
+          </div>
+
+          <div class="track" id="track">
+            <div class="slide">
+              <div class="quote">
+                “It feels premium — motion is subtle, interactions are snappy, and everything is readable.”
+              </div>
+              <div class="who">
+                <div class="left">
+                  <div class="avatar" aria-hidden="true"></div>
+                  <div>
+                    <strong>Alex M.</strong>
+                    <small>Product Designer</small>
+                  </div>
+                </div>
+                <small>★ ★ ★ ★ ★</small>
+              </div>
+            </div>
+
+            <div class="slide">
+              <div class="quote">
+                “Single-file is perfect for quick demos. The tilt + counters are my favorite parts.”
+              </div>
+              <div class="who">
+                <div class="left">
+                  <div class="avatar" aria-hidden="true"></div>
+                  <div>
+                    <strong>Jamie R.</strong>
+                    <small>Frontend Engineer</small>
+                  </div>
+                </div>
+                <small>★ ★ ★ ★ ★</small>
+              </div>
+            </div>
+
+            <div class="slide">
+              <div class="quote">
+                “This is a great starting point for a startup landing page or portfolio.”
+              </div>
+              <div class="who">
+                <div class="left">
+                  <div class="avatar" aria-hidden="true"></div>
+                  <div>
+                    <strong>Priya K.</strong>
+                    <small>Founder</small>
+                  </div>
+                </div>
+                <small>★ ★ ★ ★ ☆</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container foot">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>NovaPulse</span>
+      </div>
+      <div>© <span id="year"></span> • Built with HTML/CSS/JS • Smooth by default</div>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project preview">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div>
+          <strong id="modalTitle">Project</strong><br />
+          <small id="modalDesc" style="color:var(--muted); font-weight:700;">Description</small>
+        </div>
+        <button class="btn" id="closeModal" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <div class="preview" id="modalPreview" aria-hidden="true"></div>
+        <div>
+          <div class="pill"><i aria-hidden="true"></i>Details</div>
+          <p style="margin:0; color:var(--muted); font-weight:650;">
+            This modal is driven by data attributes on the gallery cards. Try filtering the gallery then opening an item.
+          </p>
+          <div class="divider"></div>
+          <button class="btn primary" id="toastBtn">
+            <span aria-hidden="true">🔔</span>
+            Trigger Toast
+          </button>
+          <button class="btn" id="copyBtn" style="margin-top:10px;">
+            <span aria-hidden="true">📋</span>
+            Copy Title
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span aria-hidden="true">✅</span>
+    <span id="toastText">Action completed.</span>
+  </div>
+
+  <script>
+    // -----------------------------
+    // UTIL
+    // -----------------------------
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+    const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // -----------------------------
+    // THEME TOGGLE (persisted)
+    // -----------------------------
+    const themeBtn = $("#themeBtn");
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+
+    themeBtn.addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+      showToast(`Theme: ${next}`);
+    });
+
+    // -----------------------------
+    // MENU BUTTON (simple)
+    // -----------------------------
+    $("#menuBtn")?.addEventListener("click", () => {
+      showToast("Menu demo: add your mobile drawer here.");
+    });
+
+    // -----------------------------
+    // SCROLL REVEAL
+    // -----------------------------
+    const revealEls = $$(".reveal");
+    if (!prefersReduced && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add("in"));
+    }
+
+    // -----------------------------
+    // PARALLAX TILT (cards + hero)
+    // -----------------------------
+    function attachTilt(el) {
+      const strength = 10; // degrees
+      const sheen = document.createElement("div");
+      sheen.style.cssText = `
+        position:absolute; inset:-40%;
+        background: radial-gradient(closest-side at 30% 30%, rgba(255,255,255,.18), transparent 60%);
+        transform: translateZ(40px);
+        opacity: 0;
+        pointer-events:none;
+        transition: opacity .25s var(--ease);
+      `;
+      el.appendChild(sheen);
+
+      const onMove = (ev) => {
+        const r = el.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width;   // 0..1
+        const y = (ev.clientY - r.top) / r.height;  // 0..1
+        const rx = (y - 0.5) * -strength;
+        const ry = (x - 0.5) * strength;
+        el.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+        sheen.style.opacity = "1";
+        sheen.style.transform = `translate3d(${(x-0.5)*30}px, ${(y-0.5)*30}px, 40px)`;
+      };
+
+      const onLeave = () => {
+        el.style.transform = "";
+        sheen.style.opacity = "0";
+      };
+
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+      el.addEventListener("blur", onLeave);
+    }
+
+    if (!prefersReduced) {
+      const tiltTargets = $$("[data-tilt]");
+      tiltTargets.forEach(attachTilt);
+      attachTilt($("#tiltHero"));
+    }
+
+    // -----------------------------
+    // HERO METRICS RANDOMIZER
+    // -----------------------------
+    const fpsEl = $("#fps");
+    const usersEl = $("#liveUsers");
+    const latencyEl = $("#latency");
+
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function formatNumber(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+    function randomizeMetrics() {
+      const fps = randInt(55, 60);
+      const users = randInt(900, 4200);
+      const latency = randInt(14, 55);
+
+      fpsEl.textContent = fps;
+      usersEl.textContent = formatNumber(users);
+      latencyEl.textContent = latency + "ms";
+    }
+
+    $("#randomizeBtn").addEventListener("click", () => {
+      randomizeMetrics();
+      showToast("Metrics updated.");
+    });
+
+    // gentle auto-update
+    if (!prefersReduced) setInterval(randomizeMetrics, 4200);
+
+    // -----------------------------
+    // COUNTERS (animate on view)
+    // -----------------------------
+    const countEls = $$(".count");
+    function animateCount(el) {
+      const to = Number(el.dataset.to || "0");
+      const suffix = el.dataset.suffix || "";
+      const duration = 900;
+      const start = performance.now();
+      const from = 0;
+
+      function tick(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const val = Math.floor(from + (to - from) * eased);
+        el.textContent = val.toLocaleString() + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    if ("IntersectionObserver" in window && !prefersReduced) {
+      const io2 = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            animateCount(e.target);
+            io2.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.25 });
+      countEls.forEach(el => io2.observe(el));
+    } else {
+      countEls.forEach(el => { el.textContent = (el.dataset.to || "0") + (el.dataset.suffix || ""); });
+    }
+
+    // -----------------------------
+    // FILTERABLE GALLERY + MODAL
+    // -----------------------------
+    const chips = $$(".chip");
+    const shots = $$(".shot");
+    const modal = $("#modal");
+    const modalTitle = $("#modalTitle");
+    const modalDesc = $("#modalDesc");
+    const modalPreview = $("#modalPreview");
+    let lastFocus = null;
+
+    function setPressed(activeChip) {
+      chips.forEach(c => c.setAttribute("aria-pressed", c === activeChip ? "true" : "false"));
+    }
+
+    function applyFilter(filter) {
+      shots.forEach((card) => {
+        const ok = filter === "all" || card.dataset.cat === filter;
+        card.style.display = ok ? "" : "none";
+      });
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const filter = chip.dataset.filter;
+        setPressed(chip);
+        applyFilter(filter);
+        showToast(`Filter: ${filter}`);
+      });
+    });
+
+    function openModal(fromCard) {
+      lastFocus = document.activeElement;
+      const title = fromCard.querySelector("h4")?.textContent?.trim() || "Project";
+      const desc = fromCard.querySelector("p")?.textContent?.trim() || "Preview";
+      const cat = fromCard.dataset.cat || "ui";
+
+      modalTitle.textContent = title;
+      modalDesc.textContent = desc;
+
+      // pick a different gradient based on category
+      const bg = {
+        ui: "linear-gradient(135deg, rgba(124,92,255,.38), rgba(40,216,255,.26))",
+        motion: "linear-gradient(135deg, rgba(85,242,166,.28), rgba(124,92,255,.30))",
+        data: "linear-gradient(135deg, rgba(255,200,87,.24), rgba(40,216,255,.22))",
+      }[cat] || "linear-gradient(135deg, rgba(124,92,255,.35), rgba(40,216,255,.25))";
+
+      modalPreview.style.background = `
+        radial-gradient(700px 280px at 25% 20%, rgba(255,255,255,.14), transparent 55%),
+        ${bg}
+      `;
+
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      $("#closeModal").focus();
+    }
+
+    function closeModal() {
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    shots.forEach((card) => {
+      card.addEventListener("click", () => openModal(card));
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openModal(card);
+        }
+      });
+    });
+
+    $("#closeModal").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.getAttribute("aria-hidden") === "false") closeModal();
+    });
+
+    // -----------------------------
+    // TOAST
+    // -----------------------------
+    const toast = $("#toast");
+    const toastText = $("#toastText");
+    let toastTimer = null;
+
+    function showToast(msg) {
+      toastText.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    $("#toastBtn").addEventListener("click", () => showToast("Toast fired from the modal!"));
+    $("#launchBtn").addEventListener("click", () => showToast("Interactions enabled. Try the gallery + tilt."));
+    $("#ctaTop").addEventListener("click", () => showToast("Scrolling to Work section…"));
+
+    $("#copyBtn").addEventListener("click", async () => {
+      const txt = modalTitle.textContent || "";
+      try {
+        await navigator.clipboard.writeText(txt);
+        showToast("Copied title to clipboard.");
+      } catch {
+        showToast("Copy not available in this browser context.");
+      }
+    });
+
+    // -----------------------------
+    // TESTIMONIALS SLIDER
+    // -----------------------------
+    const track = $("#track");
+    const slides = $$(".slide", track);
+    let idx = 0;
+
+    function go(i) {
+      idx = (i + slides.length) % slides.length;
+      track.style.transform = `translateX(${-idx * 100}%)`;
+    }
+    $("#prevSlide").addEventListener("click", () => go(idx - 1));
+    $("#nextSlide").addEventListener("click", () => go(idx + 1));
+
+    // Auto-advance
+    if (!prefersReduced) setInterval(() => go(idx + 1), 5500);
+
+    // Keyboard support when focused
+    $("#testimonials").addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") go(idx - 1);
+      if (e.key === "ArrowRight") go(idx + 1);
+    });
+
+    // -----------------------------
+    // FOOTER YEAR
+    // -----------------------------
+    $("#year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
