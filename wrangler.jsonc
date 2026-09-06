@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "george-sedra-api",
+  "main": "api/src/index.ts",
+  "compatibility_date": "2026-09-06",
+  "minify": true,
+  "vars": {
+    "APP_ENV": "development",
+    "CORS_ORIGINS": "http://localhost:5173"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "george-sedra",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "RESUMES",
+      "bucket_name": "george-sedra-resumes"
+    }
+  ]
+}

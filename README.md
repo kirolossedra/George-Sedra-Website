@@ -1,8 +1,21 @@
-# George Sedra Consulting — React Frontend
+# George Sedra Consulting
 
-A complete React/Vite frontend rebuild of the original static website.
+React/Vite company website with a Hono backend prepared for Cloudflare Workers and Cloudflare D1.
 
-## Current scope
+## Current architecture
+
+```text
+React + TypeScript + Vite (frontend)
+              |
+              | API connection is intentionally deferred
+              v
+Hono API on Cloudflare Workers (implemented, not yet authorized/deployed)
+              |
+              +--> Cloudflare D1 (jobs, applications, inquiries)
+              +--> Cloudflare R2 (resume files; code ready, binding deferred)
+```
+
+## Frontend scope
 
 - Responsive company website for Engineering, Environmental, and Real Estate services
 - Engineering page covering municipal applications, structural/drawings, P.Eng. review/stamping, mechanical, electrical, and HVAC coordination
@@ -10,13 +23,26 @@ A complete React/Vite frontend rebuild of the original static website.
 - Real Estate service page
 - Careers page with department filters
 - Job detail routes
-- Frontend-only application form with resume selection UI
-- About and frontend-only Contact page
-- Existing source images reorganized under `public/assets`
+- Application and contact interfaces
+- About page
 
-## Important prototype limitations
+The frontend still uses local prototype data and local-only form behavior until the API-linking phase.
 
-There is no backend. Career applications and contact forms intentionally do not transmit or persist data. Sample job postings are clearly identified as prototype content. Phone/email/service-area values in `src/data/site.ts` are placeholders and should be replaced with verified company information.
+## Backend scope
+
+The Hono backend is under `api/` and includes:
+
+- Public published-job retrieval
+- Job application persistence
+- Contact request persistence
+- Structured project inquiry persistence
+- Admin job-posting lifecycle
+- Admin application/request review workflows
+- D1 migrations
+- Bearer-protected admin routes
+- R2-ready resume upload/download code
+
+See `api/README.md` for the API route inventory and the later Cloudflare-linking procedure.
 
 ## Development
 
@@ -25,15 +51,31 @@ npm install
 npm run dev
 ```
 
+When Cloudflare is linked later:
+
+```bash
+npm run api:dev
+```
+
 ## Quality checks
 
 ```bash
 npm run check
+npm run api:typecheck
+```
+
+or:
+
+```bash
+npm run check:all
 ```
 
 ## Main customization points
 
 - Company contact information: `src/data/site.ts`
-- Job postings: `src/data/jobs.ts`
+- Temporary frontend job data: `src/data/jobs.ts`
+- Backend: `api/src`
+- D1 schema: `api/migrations/0001_initial.sql`
+- Cloudflare config template: `wrangler.jsonc`
 - Global visual system: `src/styles/global.css`
-- Routes: `src/App.tsx`
+- Frontend routes: `src/App.tsx`

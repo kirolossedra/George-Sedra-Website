@@ -34,3 +34,15 @@
 - TypeScript syntax parsing passed for all 21 TypeScript/TSX source files.
 - All referenced local image assets were verified to exist.
 - A full `npm install` / production build could not be executed because this execution environment could not resolve `registry.npmjs.org` (`EAI_AGAIN`). The project includes normal npm configuration and `npm run check` for lint + production build once dependencies are available.
+
+## 2026-09-06 — Hono + D1 backend foundation
+
+- Added a Cloudflare Workers-ready Hono API under `api/src`.
+- Added D1 relational schema for jobs, job applications, contact requests, and project inquiries.
+- Added public job, application, contact, and project-inquiry endpoints.
+- Added bearer-protected admin endpoints for job lifecycle and human review workflows.
+- Added R2-ready resume upload/download endpoints without binding Cloudflare resources yet.
+- Added a Cloudflare Wrangler configuration template only; no account/database IDs or secrets are committed.
+- Kept the React frontend intentionally disconnected until the later linking phase.
+- Did not add applicant scoring or automatic rejection logic; application status remains a human-review workflow.
+- Added `BACKEND_IMPLEMENTATION_NOTES.md` with scope, design boundaries, validation evidence, and deferred Cloudflare-linking steps.
