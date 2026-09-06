@@ -16,7 +16,6 @@ export type ApplicationRow = {
   experience: string;
   status: ApplicationStatus;
   resume_name: string | null;
-  resume_key: string | null;
   resume_content_type: string | null;
   resume_size: number | null;
   consent_at: string;
@@ -30,6 +29,15 @@ type HistoryRow = {
   to_status: ApplicationStatus;
   note: string | null;
   changed_at: string;
+};
+
+export type ApplicationResumeRow = {
+  application_id: string;
+  file_name: string;
+  content_type: string;
+  size: number;
+  base64_data: string;
+  created_at: string;
 };
 
 function mapApplication(row: ApplicationRow) {
@@ -47,7 +55,7 @@ function mapApplication(row: ApplicationRow) {
     interest: row.interest,
     experience: row.experience,
     status: row.status,
-    resume: row.resume_key ? {
+    resume: row.resume_name ? {
       name: row.resume_name,
       contentType: row.resume_content_type,
       size: row.resume_size,
@@ -59,14 +67,38 @@ function mapApplication(row: ApplicationRow) {
   };
 }
 
+const applicationSelect = `SELECT
+  a.id,
+  a.job_id,
+  a.first_name,
+  a.last_name,
+  a.email,
+  a.phone,
+  a.city,
+  a.portfolio_url,
+  a.interest,
+  a.experience,
+  a.status,
+  a.consent_at,
+  a.created_at,
+  a.updated_at,
+  j.title AS job_title,
+  j.slug AS job_slug,
+  r.file_name AS resume_name,
+  r.content_type AS resume_content_type,
+  r.size AS resume_size
+FROM job_applications a
+JOIN jobs j ON j.id = a.job_id
+LEFT JOIN application_resumes r ON r.application_id = a.id`;
+
 export async function createApplication(db: D1Database, input: ApplicationInput) {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await db.batch([
     db.prepare(`INSERT INTO job_applications
       (id, job_id, first_name, last_name, email, phone, city, portfolio_url, interest, experience, status,
-       resume_name, resume_key, resume_content_type, resume_size, consent_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?, ?, ?, ?, ?)`)
+       consent_at, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'submitted', ?, ?, ?)`) 
       .bind(
         id,
         input.jobId,
@@ -78,25 +110,31 @@ export async function createApplication(db: D1Database, input: ApplicationInput)
         input.portfolio,
         input.interest,
         input.experience,
-        input.resumeName,
-        input.resumeKey,
-        input.resumeContentType,
-        input.resumeSize,
         now,
         now,
         now,
       ),
+    db.prepare(`INSERT INTO application_resumes
+      (application_id, file_name, content_type, size, base64_data, created_at)
+      VALUES (?, ?, ?, ?, ?, ?)`) 
+      .bind(
+        id,
+        input.resumeName,
+        input.resumeContentType,
+        input.resumeSize,
+        input.resumeBase64,
+        now,
+      ),
     db.prepare(`INSERT INTO application_status_history
       (id, application_id, from_status, to_status, note, changed_at)
-      VALUES (?, ?, NULL, 'submitted', NULL, ?)`)
+      VALUES (?, ?, NULL, 'submitted', NULL, ?)`) 
       .bind(crypto.randomUUID(), id, now),
   ]);
   return getApplicationById(db, id);
 }
 
 export async function getApplicationById(db: D1Database, id: string) {
-  const row = await db.prepare(`SELECT a.*, j.title AS job_title, j.slug AS job_slug
-    FROM job_applications a JOIN jobs j ON j.id = a.job_id WHERE a.id = ? LIMIT 1`)
+  const row = await db.prepare(`${applicationSelect} WHERE a.id = ? LIMIT 1`)
     .bind(id)
     .first<ApplicationRow>();
   return row ? mapApplication(row) : null;
@@ -137,8 +175,7 @@ export async function listApplications(
   }
   const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
   const [rowsResult, countResult] = await db.batch([
-    db.prepare(`SELECT a.*, j.title AS job_title, j.slug AS job_slug
-      FROM job_applications a JOIN jobs j ON j.id = a.job_id
+    db.prepare(`${applicationSelect}
       ${where} ORDER BY a.created_at DESC LIMIT ? OFFSET ?`).bind(...params, options.limit, options.offset),
     db.prepare(`SELECT COUNT(*) AS count FROM job_applications a ${where}`).bind(...params),
   ]);
@@ -159,14 +196,15 @@ export async function updateApplicationStatus(db: D1Database, id: string, update
       .bind(update.status, now, id),
     db.prepare(`INSERT INTO application_status_history
       (id, application_id, from_status, to_status, note, changed_at)
-      VALUES (?, ?, ?, ?, ?, ?)`)
+      VALUES (?, ?, ?, ?, ?, ?)`) 
       .bind(crypto.randomUUID(), id, existing.status, update.status, update.note, now),
   ]);
   return getApplicationDetail(db, id);
 }
 
-export async function getApplicationResumeMetadata(db: D1Database, id: string) {
-  return db.prepare('SELECT resume_key, resume_name, resume_content_type FROM job_applications WHERE id = ? LIMIT 1')
+export async function getApplicationResume(db: D1Database, id: string) {
+  return db.prepare(`SELECT application_id, file_name, content_type, size, base64_data, created_at
+    FROM application_resumes WHERE application_id = ? LIMIT 1`)
     .bind(id)
-    .first<{ resume_key: string | null; resume_name: string | null; resume_content_type: string | null }>();
+    .first<ApplicationResumeRow>();
 }

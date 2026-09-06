@@ -2,7 +2,6 @@ export type AppBindings = {
   DB: D1Database;
   ADMIN_API_TOKEN: string;
   CORS_ORIGINS?: string;
-  RESUMES?: R2Bucket;
   APP_ENV?: 'development' | 'preview' | 'production';
 };
 

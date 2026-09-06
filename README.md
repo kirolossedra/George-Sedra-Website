@@ -11,8 +11,12 @@ React + TypeScript + Vite (frontend)
               v
 Hono API on Cloudflare Workers (implemented, not yet authorized/deployed)
               |
-              +--> Cloudflare D1 (jobs, applications, inquiries)
-              +--> Cloudflare R2 (resume files; code ready, binding deferred)
+              +--> Cloudflare D1
+                   - jobs
+                   - applications
+                   - base64 resumes
+                   - contact requests
+                   - project inquiries
 ```
 
 ## Frontend scope
@@ -34,13 +38,13 @@ The Hono backend is under `api/` and includes:
 
 - Public published-job retrieval
 - Job application persistence
+- Base64 resume persistence in D1
 - Contact request persistence
 - Structured project inquiry persistence
 - Admin job-posting lifecycle
 - Admin application/request review workflows
 - D1 migrations
 - Bearer-protected admin routes
-- R2-ready resume upload/download code
 
 See `api/README.md` for the API route inventory and the later Cloudflare-linking procedure.
 

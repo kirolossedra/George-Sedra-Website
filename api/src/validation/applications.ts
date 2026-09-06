@@ -1,4 +1,5 @@
 import type { ApplicationStatus } from '../types';
+import { validateBase64Resume } from '../services/resume';
 import {
   booleanValue,
   enumValue,
@@ -23,10 +24,10 @@ export type ApplicationInput = {
   interest: string;
   experience: string;
   consent: boolean;
-  resumeName: string | null;
-  resumeKey: string | null;
-  resumeContentType: string | null;
-  resumeSize: number | null;
+  resumeName: string;
+  resumeContentType: string;
+  resumeSize: number;
+  resumeBase64: string;
 };
 
 export type ApplicationStatusUpdate = {
@@ -41,6 +42,12 @@ export function parseApplication(value: unknown): ApplicationInput {
     throw validationError('consent', 'Application consent must be accepted.');
   }
 
+  const resume = validateBase64Resume({
+    name: requiredString(body, 'resumeName', { max: 255 }),
+    contentType: requiredString(body, 'resumeContentType', { max: 150 }),
+    base64: requiredString(body, 'resumeBase64', { max: 1_400_000 }),
+  });
+
   return {
     jobId: requiredString(body, 'jobId', { max: 100 }),
     firstName: requiredString(body, 'firstName', { max: 100 }),
@@ -52,10 +59,10 @@ export function parseApplication(value: unknown): ApplicationInput {
     interest: requiredString(body, 'interest', { max: 5000 }),
     experience: requiredString(body, 'experience', { max: 7000 }),
     consent,
-    resumeName: null,
-    resumeKey: null,
-    resumeContentType: null,
-    resumeSize: null,
+    resumeName: resume.name,
+    resumeContentType: resume.contentType,
+    resumeSize: resume.size,
+    resumeBase64: resume.base64,
   };
 }
 

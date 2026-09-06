@@ -3,7 +3,7 @@ import { ApiError } from '../errors';
 import { archiveJob, createJob, getJobById, listAllJobs, updateJob } from '../db/jobs';
 import {
   getApplicationDetail,
-  getApplicationResumeMetadata,
+  getApplicationResume,
   listApplications,
   updateApplicationStatus,
 } from '../db/applications';
@@ -14,6 +14,7 @@ import {
   updateProjectInquiryStatus,
 } from '../db/requests';
 import { ok, paged, readJson } from '../http';
+import { resumeBase64ToBytes } from '../services/resume';
 import type { AppEnv, ApplicationStatus, JobStatus } from '../types';
 import { parseApplicationStatusUpdate } from '../validation/applications';
 import { expectObject, parsePagination } from '../validation/common';
@@ -85,18 +86,20 @@ adminRoutes.patch('/applications/:id/status', async (c) => {
 });
 
 adminRoutes.get('/applications/:id/resume', async (c) => {
-  if (!c.env.RESUMES) throw new ApiError(503, 'RESUME_STORAGE_NOT_CONFIGURED', 'Resume storage has not been linked yet.');
-  const metadata = await getApplicationResumeMetadata(c.env.DB, c.req.param('id'));
-  if (!metadata?.resume_key) throw new ApiError(404, 'RESUME_NOT_FOUND', 'No resume is attached to this application.');
-  const object = await c.env.RESUMES.get(metadata.resume_key);
-  if (!object) throw new ApiError(404, 'RESUME_NOT_FOUND', 'The resume file could not be found.');
+  const resume = await getApplicationResume(c.env.DB, c.req.param('id'));
+  if (!resume) throw new ApiError(404, 'RESUME_NOT_FOUND', 'No resume is attached to this application.');
 
-  const headers = new Headers();
-  object.writeHttpMetadata(headers);
-  headers.set('content-type', metadata.resume_content_type || headers.get('content-type') || 'application/octet-stream');
-  headers.set('content-disposition', `attachment; filename="${(metadata.resume_name || 'resume').replace(/["\\]/g, '_')}"`);
-  headers.set('cache-control', 'private, no-store');
-  return new Response(object.body, { headers });
+  const bytes = resumeBase64ToBytes(resume.base64_data);
+  const safeName = resume.file_name.replace(/["\\]/g, '_');
+
+  return new Response(bytes, {
+    headers: {
+      'content-type': resume.content_type,
+      'content-disposition': `attachment; filename="${safeName}"`,
+      'content-length': String(resume.size),
+      'cache-control': 'private, no-store',
+    },
+  });
 });
 
 adminRoutes.get('/contact-requests', async (c) => {

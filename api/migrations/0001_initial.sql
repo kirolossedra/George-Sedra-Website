@@ -45,10 +45,6 @@ CREATE TABLE IF NOT EXISTS job_applications (
   interest TEXT NOT NULL,
   experience TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'submitted' CHECK (status IN ('submitted', 'under_review', 'interview', 'offer', 'hired', 'declined', 'withdrawn')),
-  resume_name TEXT,
-  resume_key TEXT,
-  resume_content_type TEXT,
-  resume_size INTEGER,
   consent_at TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -57,6 +53,21 @@ CREATE TABLE IF NOT EXISTS job_applications (
 CREATE INDEX IF NOT EXISTS idx_applications_job_created ON job_applications(job_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_applications_status_created ON job_applications(status, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_applications_email ON job_applications(email);
+
+CREATE TABLE IF NOT EXISTS application_resumes (
+  application_id TEXT PRIMARY KEY REFERENCES job_applications(id) ON DELETE CASCADE,
+  file_name TEXT NOT NULL,
+  content_type TEXT NOT NULL CHECK (
+    content_type IN (
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+  ),
+  size INTEGER NOT NULL CHECK (size > 0 AND size <= 1000000),
+  base64_data TEXT NOT NULL,
+  created_at TEXT NOT NULL
+) STRICT;
 
 CREATE TABLE IF NOT EXISTS application_status_history (
   id TEXT PRIMARY KEY,
