@@ -48,7 +48,7 @@ The image IDs below define the canonical sequential mapping for the illustrated 
 
 | Media | Type | Description |
 | --- | --- | --- |
-| _No media files uploaded yet._ | — | The photo IDs above are mappings only; image files will be added later. |
+| `first-page.png` | Image — cover page | Arabic illustrated cover for *Zak-Zok and the Crocodile*, used as the first page of the Standard Arabic edition. |
 
 ## Catalog Rules
 

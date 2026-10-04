@@ -17,7 +17,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE / "book.tex"
-PDF = HERE / "book-rendered-v3.pdf"
+PDF = HERE / "book-rendered-v6.pdf"
 MEDIA = HERE.parent / "shared-media"
 PAGE_COMMANDS = {
     "TextOnlyPage": 1,
@@ -70,6 +70,11 @@ def read_group(source: str, pos: int) -> tuple[str, int]:
 
 
 def tex_to_html(text: str) -> str:
+    text = re.sub(
+        r"\\addcontentsline\s*\{[^{}]*\}\s*\{[^{}]*\}\s*\{[^{}]*\}",
+        "",
+        text,
+    )
     text = re.sub(r"\\vspace\*?\s*\{[^{}]*\}", "", text)
     text = text.replace(r"\begin{center}", "__CENTER_OPEN__")
     text = text.replace(r"\end{center}", "__CENTER_CLOSE__")
