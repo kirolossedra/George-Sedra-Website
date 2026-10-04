@@ -17,7 +17,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE / "book.tex"
-PDF = HERE / "book-rendered-v2.pdf"
+PDF = HERE / "book-rendered-v3.pdf"
 MEDIA = HERE.parent / "shared-media"
 PAGE_COMMANDS = {
     "TextOnlyPage": 1,
@@ -212,13 +212,13 @@ body { font-family: Arial, "Segoe UI", sans-serif; color: #111; }
 .content .large { font-size: 1.35em; }
 .content strong { font-weight: 700; }
 .content .footnote { font-size: 0.72em; }
-.narration { width: calc(100% - 33mm); margin: 0 0 0.4em auto; }
+.narration { width: calc(100% - 40mm); margin: 0 0 0.4em auto; }
 .dialogue {
   width: 100%; display: flex; flex-direction: row; direction: rtl;
-  align-items: flex-start; gap: 5mm; margin: 0.38em 0;
+  align-items: flex-start; gap: 8mm; margin: 0.85em 0;
 }
-.dialogue-text { flex: 1 1 auto; width: calc(100% - 33mm); text-align: right; }
-.speaker { flex: 0 0 28mm; font-weight: 700; text-align: right; }
+.dialogue-text { flex: 1 1 auto; width: calc(100% - 40mm); text-align: right; }
+.speaker { flex: 0 0 32mm; font-weight: 700; text-align: right; }
 .full-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .inset-page { display: flex; align-items: center; justify-content: center; }
 .inset-image { display: block; width: 90%; max-height: 58%; object-fit: contain; margin: 0 auto; }

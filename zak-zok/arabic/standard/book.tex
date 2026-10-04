@@ -76,8 +76,8 @@
 \newlength{\DialogueGap}
 \newlength{\StoryBodyWidth}
 
-\setlength{\SpeakerGutter}{28mm}
-\setlength{\DialogueGap}{5mm}
+\setlength{\SpeakerGutter}{32mm}
+\setlength{\DialogueGap}{8mm}
 \setlength{\StoryBodyWidth}{\dimexpr\textwidth-\SpeakerGutter-\DialogueGap\relax}
 
 \newcommand{\Narration}[1]{%
@@ -91,7 +91,7 @@
 }
 
 \newcommand{\DialogueLine}[2]{%
-  \par\addvspace{0.38\baselineskip}
+  \par\addvspace{0.75\baselineskip}
   \noindent
   % In the Arabic right-to-left run, the first minipage occupies the right gutter.
   \begin{minipage}[t]{\SpeakerGutter}
