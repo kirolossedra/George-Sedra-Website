@@ -1,6 +1,6 @@
 % Zak-Zok — Standard Arabic edition
-% BACKBONE ONLY: story text is not populated yet.
-% Illustration assignments ARE populated using the canonical shared-media IDs:
+% STORY POPULATION STARTED from the original scanned book.
+% Illustration assignments use the canonical shared-media IDs:
 %   1, 2, 3, ... 14
 %
 % The four page types are modeled explicitly below:
@@ -79,7 +79,7 @@
 \setlength{\DialogueGap}{5mm}
 \setlength{\StoryBodyWidth}{\dimexpr\textwidth-\SpeakerGutter-\DialogueGap\relax}
 
-% Narration/prose constrained to the body column.
+% Narration/prose constrained to the body column on dialogue-capable pages.
 \newcommand{\Narration}[1]{%
   \par
   \noindent
@@ -196,7 +196,29 @@
 \begin{document}
 
 % ===========================================================================
-% STORY IMAGE MAPPING — PHOTO NAMES POPULATED, STORY TEXT STILL UNPOPULATED
+% STORY
+% ===========================================================================
+
+% ---------------------------------------------------------------------------
+% Original PDF page 9 — printed story page 8 — TYPE 1: white page + text only
+% Source transcription preserved from the scanned edition.
+% ---------------------------------------------------------------------------
+\TextOnlyPage{%
+  \begin{center}
+    {\Large\bfseries زقزوق و التمساح}
+  \end{center}
+
+  \vspace{1.4cm}
+
+  أخذ زقزوق\footnote{زقزوق: أحد الطيور التي توجد بوفرة في الصعيد بين سيول وطيبة واسمه العلمي الزقزاق ذو الرأس السوداء (طير التمساح).} يضرب جناحيه بقوة وكان قلبه الصغير يخفق بشدة وهو طائر فوق النيل العظيم .. كاد في هذه اللحظة أن يبلغ الضفة الشرقية للنيل حيث يسكن هو وإخوته .. كان اليوم هو يوم من أيام الخريف والوقت وقت الغروب والشمس تسحب آخر أشعتها الذهبية من على صفحة النيل، وكان زقزوق ينظر إلى الماء الذي اكتسب لونا أسود غامضا فيه رهبة الليل التي لا ينقذه منها إلا النظر إلى قرص الشمس الأحمر، أو حينما يحول نظره فيرى مدينة «الأقصر» الكائنة في صعيد مصر ومن ورائها قريته الصغيرة التي يحبها.
+
+  أخذ زقزوق يقترب من قريته بسرعة بعدما عبر «الأقصر» شاهد حقولها المربع الجميل وأهلها الطيبين الذين يحبهم. كان كل شيء في القرية يمضي كعادته. لم يتغير شيء في اليومين اللذين ترك فيهما زقزوق قريته.
+
+  ها هو «حمصص» حمار العم «عبد السلام»، عائدا في طريقه من الحقل الصغير حاملا جوالا من القمح.
+}
+
+% ===========================================================================
+% STORY IMAGE MAPPING — PHOTO NAMES POPULATED, REMAINING STORY TEXT PENDING
 % ===========================================================================
 %
 % These assignments mirror ../shared-media/schema.md.
@@ -284,7 +306,6 @@
 % ---------------------------------------------------------------------------
 % \InsetIllustrationPage{14}
 %
-% TYPE 1 pages are not listed in this image mapping because they have no photo.
-% They will be populated later using \TextOnlyPage{...}.
+% Other TYPE 1 pages will be populated sequentially from the source scan.
 
 \end{document}
