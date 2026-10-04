@@ -50,6 +50,10 @@
 \setlength{\parskip}{0.40\baselineskip}
 \pagestyle{empty}
 
+% Larger story type for comfortable reading at the book's trim size.
+\AtBeginDocument{\fontsize{14pt}{18pt}\selectfont}
+\renewcommand{\footnotesize}{\fontsize{12pt}{15pt}\selectfont}
+
 % ---------------------------------------------------------------------------
 % SHARED MEDIA
 % ---------------------------------------------------------------------------
@@ -89,15 +93,16 @@
 \newcommand{\DialogueLine}[2]{%
   \par\addvspace{0.38\baselineskip}
   \noindent
+  % In the Arabic right-to-left run, the first minipage occupies the right gutter.
+  \begin{minipage}[t]{\SpeakerGutter}
+    \RaggedLeft
+    \bfseries #1
+  \end{minipage}%
+  \hspace{\DialogueGap}%
   \begin{minipage}[t]{\StoryBodyWidth}
     \RaggedLeft
     #2
   \end{minipage}%
-  \hspace{\DialogueGap}%
-  \begin{minipage}[t]{\SpeakerGutter}
-    \RaggedLeft
-    \bfseries #1
-  \end{minipage}
   \par
 }
 
