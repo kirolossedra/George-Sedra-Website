@@ -1,0 +1,220 @@
+% Zak-Zok — Standard Arabic edition
+% BACKBONE ONLY: no story content or final image assignments are populated yet.
+%
+% The four page types are modeled explicitly below:
+%   TYPE 1 — white page + text only
+%   TYPE 2 — full illustration + native LaTeX text
+%   TYPE 3 — full illustration, no text
+%   TYPE 4 — white page + inset illustration
+%
+% Build with XeLaTeX.
+
+\documentclass[12pt]{article}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{ragged2e}
+\usepackage{xcolor}
+
+\setdefaultlanguage{arabic}
+\setotherlanguage{english}
+
+% Prefer Amiri, with a Noto fallback when available.
+\IfFontExistsTF{Amiri}
+  {\newfontfamily\arabicfont[Script=Arabic,Scale=1.10]{Amiri}}
+  {\newfontfamily\arabicfont[Script=Arabic,Scale=1.10]{Noto Naskh Arabic}}
+
+% ---------------------------------------------------------------------------
+% PROVISIONAL BOOK GEOMETRY
+% ---------------------------------------------------------------------------
+% These dimensions are placeholders for the rebuilt edition.
+% Lock the final KDP trim + bleed dimensions before production export.
+\newcommand{\BookWidth}{170mm}
+\newcommand{\BookHeight}{232mm}
+
+\geometry{
+  paperwidth=\BookWidth,
+  paperheight=\BookHeight,
+  top=14mm,
+  bottom=14mm,
+  inner=14mm,
+  outer=14mm
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55\baselineskip}
+\pagestyle{empty}
+
+% ---------------------------------------------------------------------------
+% SHARED MEDIA
+% ---------------------------------------------------------------------------
+% Standard Arabic pages may reference approved assets stored in:
+%   ../shared-media/
+\graphicspath{{../shared-media/}}
+
+% ---------------------------------------------------------------------------
+% DIALOGUE / DRAMA GEOMETRY
+% ---------------------------------------------------------------------------
+% The right-hand speaker gutter is reserved.
+% Dialogue content begins at a shifted level to its left.
+% Wrapped dialogue MUST NOT enter the speaker-name gutter.
+% Narration on dialogue-capable pages uses the same body width, so prose also
+% cannot slip into the speaker-name spacing level.
+\newlength{\SpeakerGutter}
+\newlength{\DialogueGap}
+\newlength{\StoryBodyWidth}
+
+\setlength{\SpeakerGutter}{28mm}
+\setlength{\DialogueGap}{5mm}
+\setlength{\StoryBodyWidth}{\dimexpr\textwidth-\SpeakerGutter-\DialogueGap\relax}
+
+% Narration/prose constrained to the body column.
+\newcommand{\Narration}[1]{%
+  \par
+  \noindent
+  \begin{minipage}[t]{\StoryBodyWidth}
+    \RaggedLeft
+    #1
+  \end{minipage}
+  \par
+}
+
+% Drama-style dialogue:
+% body text on the left; fixed speaker gutter on the right.
+\newcommand{\DialogueLine}[2]{%
+  \par\addvspace{0.75\baselineskip}
+  \noindent
+  \begin{minipage}[t]{\StoryBodyWidth}
+    \RaggedLeft
+    #2
+  \end{minipage}%
+  \hspace{\DialogueGap}%
+  \begin{minipage}[t]{\SpeakerGutter}
+    \RaggedLeft
+    \bfseries #1
+  \end{minipage}
+  \par
+}
+
+% ---------------------------------------------------------------------------
+% COMMON IMAGE HELPERS
+% ---------------------------------------------------------------------------
+
+% Full-page image layer used by TYPE 2 and TYPE 3.
+\newcommand{\FullPageImage}[1]{%
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[
+      anchor=center,
+      inner sep=0pt
+    ] at (current page.center) {%
+      \includegraphics[
+        width=\paperwidth,
+        height=\paperheight
+      ]{#1}%
+    };
+  \end{tikzpicture}%
+}
+
+% ---------------------------------------------------------------------------
+% TYPE 1 — WHITE PAGE + TEXT ONLY
+% ---------------------------------------------------------------------------
+% Use for ordinary text pages.
+% #1 = native Arabic LaTeX story content.
+\newcommand{\TextOnlyPage}[1]{%
+  \clearpage
+  \thispagestyle{empty}
+  \vspace*{2mm}
+  #1
+  \clearpage
+}
+
+% ---------------------------------------------------------------------------
+% TYPE 2 — FULL ILLUSTRATION + TEXT
+% ---------------------------------------------------------------------------
+% Use when restored artwork fills the page and Arabic is layered above it.
+% The Arabic remains native/vector text; it is NOT baked into the image.
+%
+% #1 = illustration file
+% #2 = native Arabic LaTeX story content
+%
+% Page-specific placement can later override the default text block position.
+\newcommand{\IllustratedTextPage}[2]{%
+  \clearpage
+  \thispagestyle{empty}
+  \FullPageImage{#1}
+  \vspace*{8mm}
+  \begin{minipage}[t]{\textwidth}
+    #2
+  \end{minipage}
+  \clearpage
+}
+
+% ---------------------------------------------------------------------------
+% TYPE 3 — FULL ILLUSTRATION, NO TEXT
+% ---------------------------------------------------------------------------
+% Use for pure full-page artwork.
+% #1 = restored/upscaled illustration file.
+\newcommand{\FullIllustrationPage}[1]{%
+  \clearpage
+  \thispagestyle{empty}
+  \FullPageImage{#1}
+  \null
+  \clearpage
+}
+
+% ---------------------------------------------------------------------------
+% TYPE 4 — WHITE PAGE + INSET ILLUSTRATION
+% ---------------------------------------------------------------------------
+% Use for a white page carrying a centered inset/vignette illustration.
+% #1 = restored/upscaled illustration file.
+\newcommand{\InsetIllustrationPage}[1]{%
+  \clearpage
+  \thispagestyle{empty}
+  \vspace*{\fill}
+  \begin{center}
+    \includegraphics[
+      width=0.82\textwidth,
+      height=0.72\textheight,
+      keepaspectratio
+    ]{#1}
+  \end{center}
+  \vspace*{\fill}
+  \clearpage
+}
+
+\begin{document}
+
+% ===========================================================================
+% PAGE SKELETON — INTENTIONALLY UNPOPULATED
+% ===========================================================================
+%
+% TYPE 1 — WHITE PAGE + TEXT ONLY
+%
+% \TextOnlyPage{%
+%   \Narration{...}
+%   \DialogueLine{زقزوق}{...}
+%   \DialogueLine{عصفور}{...}
+% }
+%
+% TYPE 2 — FULL ILLUSTRATION + TEXT
+%
+% \IllustratedTextPage{approved-image.png}{%
+%   \Narration{...}
+%   \DialogueLine{زقزوق}{...}
+% }
+%
+% TYPE 3 — FULL ILLUSTRATION, NO TEXT
+%
+% \FullIllustrationPage{approved-image.png}
+%
+% TYPE 4 — WHITE PAGE + INSET ILLUSTRATION
+%
+% \InsetIllustrationPage{approved-vignette.png}
+%
+% Populate pages only after the final text transcription and approved restored
+% illustrations are ready.
+
+\end{document}
