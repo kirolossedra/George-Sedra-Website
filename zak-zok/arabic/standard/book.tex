@@ -1,5 +1,7 @@
 % Zak-Zok — Standard Arabic edition
-% BACKBONE ONLY: no story content or final image assignments are populated yet.
+% BACKBONE ONLY: story text is not populated yet.
+% Illustration assignments ARE populated using the canonical shared-media IDs:
+%   1, 2, 3, ... 14
 %
 % The four page types are modeled explicitly below:
 %   TYPE 1 — white page + text only
@@ -51,8 +53,14 @@
 % ---------------------------------------------------------------------------
 % SHARED MEDIA
 % ---------------------------------------------------------------------------
-% Standard Arabic pages may reference approved assets stored in:
+% Standard Arabic pages reference approved assets stored in:
 %   ../shared-media/
+%
+% Illustration files are canonically named by sequential ID only:
+%   1, 2, 3, ... 14
+%
+% No extension is hardcoded here. \includegraphics can resolve standard image
+% extensions such as .png, .jpg, and .pdf once the assets are uploaded.
 \graphicspath{{../shared-media/}}
 
 % ---------------------------------------------------------------------------
@@ -137,7 +145,7 @@
 % Use when restored artwork fills the page and Arabic is layered above it.
 % The Arabic remains native/vector text; it is NOT baked into the image.
 %
-% #1 = illustration file
+% #1 = illustration file ID
 % #2 = native Arabic LaTeX story content
 %
 % Page-specific placement can later override the default text block position.
@@ -156,7 +164,7 @@
 % TYPE 3 — FULL ILLUSTRATION, NO TEXT
 % ---------------------------------------------------------------------------
 % Use for pure full-page artwork.
-% #1 = restored/upscaled illustration file.
+% #1 = restored/upscaled illustration file ID.
 \newcommand{\FullIllustrationPage}[1]{%
   \clearpage
   \thispagestyle{empty}
@@ -169,7 +177,7 @@
 % TYPE 4 — WHITE PAGE + INSET ILLUSTRATION
 % ---------------------------------------------------------------------------
 % Use for a white page carrying a centered inset/vignette illustration.
-% #1 = restored/upscaled illustration file.
+% #1 = restored/upscaled illustration file ID.
 \newcommand{\InsetIllustrationPage}[1]{%
   \clearpage
   \thispagestyle{empty}
@@ -188,33 +196,95 @@
 \begin{document}
 
 % ===========================================================================
-% PAGE SKELETON — INTENTIONALLY UNPOPULATED
+% STORY IMAGE MAPPING — PHOTO NAMES POPULATED, STORY TEXT STILL UNPOPULATED
 % ===========================================================================
 %
-% TYPE 1 — WHITE PAGE + TEXT ONLY
+% These assignments mirror ../shared-media/schema.md.
+% The literal image file names are 1, 2, 3, ... 14.
+% Calls remain commented until the corresponding image files are uploaded;
+% this keeps the backbone compilable before media is present.
 %
-% \TextOnlyPage{%
-%   \Narration{...}
-%   \DialogueLine{زقزوق}{...}
-%   \DialogueLine{عصفور}{...}
+% ---------------------------------------------------------------------------
+% Original page 13 — Photo 1 — TYPE 2: full illustration + text
+% ---------------------------------------------------------------------------
+% \IllustratedTextPage{1}{%
+%   % TODO: populate native Arabic story text for page 13.
 % }
 %
-% TYPE 2 — FULL ILLUSTRATION + TEXT
+% ---------------------------------------------------------------------------
+% Original page 14 — Photo 2 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{2}
 %
-% \IllustratedTextPage{approved-image.png}{%
-%   \Narration{...}
-%   \DialogueLine{زقزوق}{...}
+% ---------------------------------------------------------------------------
+% Original page 17 — Photo 3 — TYPE 2: full illustration + text
+% ---------------------------------------------------------------------------
+% \IllustratedTextPage{3}{%
+%   % TODO: populate native Arabic story text for page 17.
 % }
 %
-% TYPE 3 — FULL ILLUSTRATION, NO TEXT
+% ---------------------------------------------------------------------------
+% Original page 18 — Photo 4 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{4}
 %
-% \FullIllustrationPage{approved-image.png}
+% ---------------------------------------------------------------------------
+% Original page 21 — Photo 5 — TYPE 2: full illustration + text
+% ---------------------------------------------------------------------------
+% \IllustratedTextPage{5}{%
+%   % TODO: populate native Arabic story text for page 21.
+% }
 %
-% TYPE 4 — WHITE PAGE + INSET ILLUSTRATION
+% ---------------------------------------------------------------------------
+% Original page 22 — Photo 6 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{6}
 %
-% \InsetIllustrationPage{approved-vignette.png}
+% ---------------------------------------------------------------------------
+% Original page 27 — Photo 7 — TYPE 4: white page + inset illustration
+% ---------------------------------------------------------------------------
+% \InsetIllustrationPage{7}
 %
-% Populate pages only after the final text transcription and approved restored
-% illustrations are ready.
+% ---------------------------------------------------------------------------
+% Original page 28 — Photo 8 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{8}
+%
+% ---------------------------------------------------------------------------
+% Original page 29 — Photo 9 — TYPE 4: white page + inset illustration
+% ---------------------------------------------------------------------------
+% \InsetIllustrationPage{9}
+%
+% ---------------------------------------------------------------------------
+% Original page 33 — Photo 10 — TYPE 2: full illustration + text
+% ---------------------------------------------------------------------------
+% \IllustratedTextPage{10}{%
+%   % TODO: populate native Arabic story text for page 33.
+% }
+%
+% ---------------------------------------------------------------------------
+% Original page 34 — Photo 11 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{11}
+%
+% ---------------------------------------------------------------------------
+% Original page 35 — Photo 12 — TYPE 3: full illustration, no text
+% ---------------------------------------------------------------------------
+% \FullIllustrationPage{12}
+%
+% ---------------------------------------------------------------------------
+% Original page 36 — Photo 13 — TYPE 2: full illustration + text
+% ---------------------------------------------------------------------------
+% \IllustratedTextPage{13}{%
+%   % TODO: populate native Arabic story/dialogue text for page 36.
+% }
+%
+% ---------------------------------------------------------------------------
+% Original page 40 — Photo 14 — TYPE 4: white page + inset illustration
+% ---------------------------------------------------------------------------
+% \InsetIllustrationPage{14}
+%
+% TYPE 1 pages are not listed in this image mapping because they have no photo.
+% They will be populated later using \TextOnlyPage{...}.
 
 \end{document}
