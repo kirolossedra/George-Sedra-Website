@@ -76,10 +76,41 @@ npm run check:all
 
 ## Main customization points
 
-- Company contact information: `src/data/site.ts`
+- Company name, contact details and navigation: `src/data/site.ts`
+- Page copy: `src/data/pages/*.ts`
 - Temporary frontend job data: `src/data/jobs.ts`
+- Website images: `src/data/media.ts` (see below)
 - Backend: `api/src`
 - D1 schema: `api/migrations/0001_initial.sql`
 - Cloudflare config template: `wrangler.jsonc`
-- Global visual system: `src/styles/global.css`
 - Frontend routes: `src/App.tsx`
+
+## Visual system
+
+Styles are plain CSS, loaded through `src/styles/index.css` in this order:
+
+| File | Contents |
+| --- | --- |
+| `tokens.css` | Colours, type scale, spacing, layout widths and the `@font-face` rule. Change design values here only. |
+| `base.css` | Element defaults, typographic role classes (`t-display`, `t-h1`…`t-label`), focus and reduced-motion handling. |
+| `layout.css` | Container, sections, header, mobile menu and footer. |
+| `components.css` | Buttons, links, page header, image frames, notices, lists and form controls. |
+| `pages.css` | Page-specific compositions. |
+
+Layouts switch to a 12-column grid at `64rem`; the full desktop navigation appears at `68rem`.
+
+The typeface is [Archivo](https://github.com/Omnibus-Type/Archivo) (SIL Open Font License, see `public/fonts/OFL-Archivo.txt`), self-hosted as a Latin variable font in `public/fonts/`.
+
+## Images
+
+Pages never reference image files directly. Each image position is a named slot (`MediaSlotId` in `src/media/types.ts`) rendered by `src/components/MediaImage.tsx`. The default asset for every slot, including its alt text, crop rectangle, caption and credit, is defined in `src/data/media.ts`.
+
+To replace images without code changes later, load slot data from an API and pass it to `MediaProvider` in `src/main.tsx`:
+
+```tsx
+<MediaProvider overrides={{ 'about.portrait': { src, alt, width, height } }}>
+```
+
+Slots that are not overridden fall back to the defaults. Crops are stored in source-image pixels, which is the format an image-cropping admin tool would produce.
+
+Several current images are Google Maps and Street View screen captures. Their crops hide the map interface, and their credit lines keep the Google attribution visible. They should be replaced with original photography or properly licensed imagery.

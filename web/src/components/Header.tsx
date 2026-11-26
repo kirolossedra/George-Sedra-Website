@@ -1,58 +1,87 @@
-import { Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { primaryNavigation, site } from '../data/site';
+import Arrow from './Arrow';
 import Logo from './Logo';
 
-const links = [
-  ['Engineering', '/engineering'],
-  ['Environmental', '/environmental'],
-  ['Real Estate', '/real-estate'],
-  ['Careers', '/careers'],
-  ['About', '/about'],
-] as const;
+const DESKTOP_QUERY = '(min-width: 68rem)';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const location = useLocation();
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const { pathname } = useLocation();
 
-  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => setOpen(false), [pathname]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('is-menu-open', open);
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    const desktop = window.matchMedia(DESKTOP_QUERY);
+    const onViewportChange = () => {
+      if (desktop.matches) setOpen(false);
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    desktop.addEventListener('change', onViewportChange);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      desktop.removeEventListener('change', onViewportChange);
+      document.documentElement.classList.remove('is-menu-open');
+    };
+  }, [open]);
 
   return (
     <header className="site-header">
-      <div className="shell header-inner">
+      <div className="container site-header__bar">
         <Logo />
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {links.map(([label, to]) => (
-            <NavLink key={to} to={to} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="header-actions">
-          <NavLink to="/contact" className="button button-small button-primary">Start a project</NavLink>
-          <button
-            className="menu-button"
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-label={open ? 'Close navigation' : 'Open navigation'}
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
-      {open && (
-        <nav className="mobile-nav" aria-label="Mobile navigation">
-          <div className="shell mobile-nav-inner">
-            {links.map(([label, to]) => (
-              <NavLink key={to} to={to} className={({ isActive }) => isActive ? 'mobile-nav-link active' : 'mobile-nav-link'}>
-                {label}
-              </NavLink>
+
+        <nav className="primary-nav" aria-label="Primary">
+          <ul className="primary-nav__list">
+            {primaryNavigation.map((item) => (
+              <li key={item.to}>
+                <NavLink to={item.to} className="primary-nav__link">{item.label}</NavLink>
+              </li>
             ))}
-            <NavLink to="/contact" className="mobile-nav-link">Contact</NavLink>
-          </div>
+          </ul>
         </nav>
-      )}
+
+        <Link to={site.contactCta.to} className="button button--compact site-header__cta">{site.contactCta.label}</Link>
+
+        <button
+          ref={toggleRef}
+          type="button"
+          className="menu-toggle"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          onClick={() => setOpen((value) => !value)}
+        >
+          <span>{open ? 'Close' : 'Menu'}</span>
+          <span className="menu-toggle__glyph" aria-hidden="true" />
+        </button>
+      </div>
+
+      <div id="mobile-menu" className="mobile-menu" hidden={!open}>
+        <nav className="container mobile-menu__inner" aria-label="Mobile">
+          <ul className="mobile-menu__list">
+            {[...primaryNavigation, { label: 'Contact', to: '/contact' }].map((item) => (
+              <li key={item.to}>
+                <NavLink to={item.to} className="mobile-menu__link">
+                  {item.label}
+                  <Arrow />
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+          <p className="mobile-menu__foot">{site.summary}</p>
+        </nav>
+      </div>
     </header>
   );
 }

@@ -42,3 +42,16 @@
 - Added PDF/DOC/DOCX validation, file-signature checks, and a 1 MB decoded-size limit.
 - Kept the protected resume-download route; it now reconstructs the file from D1 base64.
 - Updated backend documentation so Cloudflare linking requires D1 only.
+
+## 2026-11-26 — Visual overhaul
+
+- Replaced the visual system with a restrained drawing-sheet style: warm paper background, graphite ink, a single redline accent, hairline rules and a 12-column grid with a label column.
+- Self-hosted the Archivo variable typeface (OFL) and removed the serif display headings.
+- Split styling into `tokens.css`, `base.css`, `layout.css`, `components.css` and `pages.css`; all colours, sizes and spacing come from tokens.
+- Moved page copy into `src/data/pages/*.ts` so pages contain presentation only. Business copy is unchanged; the only new text is three section headings that previously had none, form group labels, and field "Optional" hints.
+- Added named image slots (`src/media/`, `src/data/media.ts`, `MediaImage`) so every image can later be replaced through an admin interface. Crops remove Google Maps and Street View interface controls from the existing captures, and the Google attribution is shown as a credit line.
+- Rebuilt the header (text navigation, full-screen mobile menu with Escape support), footer (title-block layout) and every page with distinct compositions: numbered service index, four-step sequence, specification-style engineering scope, Phase I / Phase II comparison, ruled job table and sectioned forms.
+- Removed icon usage and the `lucide-react` dependency; arrows are a single inline SVG.
+- Fixed horizontal overflow of the careers filter on phones.
+- Added a favicon.
+- Prototype notices, routes, form behaviour, job filters and the Hono / D1 backend are unchanged.

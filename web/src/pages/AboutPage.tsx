@@ -1,21 +1,41 @@
-import { Compass, Layers3, Users } from 'lucide-react';
-import PageHero from '../components/PageHero';
+import MediaImage from '../components/MediaImage';
+import PageHeader from '../components/PageHeader';
+import SectionHead from '../components/SectionHead';
+import { aboutContent } from '../data/pages/about';
 
 export default function AboutPage() {
+  const { header, principles, leadership } = aboutContent;
+
   return (
     <>
-      <PageHero eyebrow="About" title="A consulting company built around coordinated property decisions." description="The company brings engineering, environmental, and real estate work into one client relationship while preserving the professional boundaries each discipline requires." aside={<img className="profile-image" src="/assets/george-sedra.jpg" alt="George Sedra" />} />
-      <section className="section">
-        <div className="shell principles-grid">
-          <article><Compass size={25} /><h2>Start with the client's actual objective</h2><p>The work should answer a real project question—approval, risk, feasibility, acquisition, sale—not create unnecessary scope for its own sake.</p></article>
-          <article><Layers3 size={25} /><h2>Coordinate without blurring accountability</h2><p>Structural, environmental, MEP, and real estate work can be connected operationally while remaining clear about who is professionally responsible for each conclusion.</p></article>
-          <article><Users size={25} /><h2>Keep people in the decision</h2><p>Clients should understand what is known, what remains uncertain, and what choices are genuinely theirs instead of being pushed through a black-box workflow.</p></article>
+      <PageHeader label={header.label} title={header.title} intro={header.intro} />
+
+      <section className="section section--ruled" aria-labelledby="principles-title">
+        <div className="container">
+          <SectionHead label={principles.label} title={principles.title} id="principles-title" />
+          <ol className="principles" role="list">
+            {principles.items.map((item, index) => (
+              <li className="principle" key={item.title}>
+                <span className="t-index principle__number">{String(index + 1).padStart(2, '0')}</span>
+                <h3 className="t-h2 principle__title">{item.title}</h3>
+                <p className="principle__body">{item.description}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
-      <section className="section section-muted">
-        <div className="shell founder-grid">
-          <div className="founder-photo"><img src="/assets/george-sedra.jpg" alt="George Sedra portrait" /></div>
-          <div><p className="eyebrow">Leadership</p><h2>George Sedra</h2><p className="founder-role">Company leadership profile</p><p>The original site included George's profile but did not contain enough verified biography, credentials, or licensing details to publish a responsible professional bio. This area is intentionally structured and ready for the real information rather than inventing credentials.</p><p>Add confirmed education, licences, years of experience, professional memberships, and project background here when available.</p></div>
+
+      <section className="section section--tinted" aria-labelledby="leadership-title">
+        <div className="container leader">
+          <MediaImage slot="about.portrait" className="leader__portrait" />
+          <div className="leader__text">
+            <p className="t-label">{leadership.label}</p>
+            <h2 className="t-h1" id="leadership-title">{leadership.name}</h2>
+            <p className="leader__role">{leadership.role}</p>
+            <div className="prose">
+              {leadership.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </div>
+          </div>
         </div>
       </section>
     </>
