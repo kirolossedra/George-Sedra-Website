@@ -8,8 +8,8 @@ export default function Logo() {
         <span>G</span><span>S</span>
       </span>
       <span className="brand-copy">
-        <strong>George Sedra</strong>
-        <span>Consulting</span>
+        <strong>GS</strong>
+        <span>Engineering</span>
       </span>
     </Link>
   );

@@ -1,6 +1,6 @@
 export const site = {
-  name: 'George Sedra Consulting',
-  shortName: 'GSC',
+  name: 'GS Engineering',
+  shortName: 'GS',
   phoneDisplay: '(000) 000-0000',
   phoneHref: 'tel:+10000000000',
   email: 'info@example.com',

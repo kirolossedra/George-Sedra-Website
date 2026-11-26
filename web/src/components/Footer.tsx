@@ -27,7 +27,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="shell footer-bottom">
-        <span>© {new Date().getFullYear()} George Sedra Consulting</span>
+        <span>© {new Date().getFullYear()} GS Engineering</span>
         <span>Frontend prototype</span>
       </div>
     </footer>

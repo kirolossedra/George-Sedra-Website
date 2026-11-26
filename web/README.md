@@ -1,4 +1,4 @@
-# George Sedra Consulting
+# GS Engineering
 
 React/Vite company website with a Hono backend prepared for Cloudflare Workers and Cloudflare D1.
 

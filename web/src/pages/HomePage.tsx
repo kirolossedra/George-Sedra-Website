@@ -11,7 +11,7 @@ export default function HomePage() {
             <p className="eyebrow">Engineering · Environment · Property</p>
             <h1>Move a property project from question to approval with fewer handoffs.</h1>
             <p className="hero-lead">
-              George Sedra Consulting coordinates engineering approvals, environmental due diligence, and real estate services so clients can make decisions with the technical context in view.
+              GS Engineering coordinates engineering approvals, environmental due diligence, and real estate services so clients can make decisions with the technical context in view.
             </p>
             <div className="button-row">
               <Link className="button button-primary" to="/contact">Discuss a project <ArrowRight size={18} /></Link>
